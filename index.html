@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English Dept. — Student Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen" class="screen active">
+  <div class="login-wrap">
+    <div class="login-brand">
+      <div class="brand-mark">E</div>
+      <div>
+        <div class="brand-title">English Dept.</div>
+        <div class="brand-sub">Student Progress Tracker</div>
+      </div>
+    </div>
+    <form class="login-form" onsubmit="handleLogin(event)">
+      <div class="field-group">
+        <label>Username</label>
+        <input type="text" id="loginUser" autocomplete="username" placeholder="your.name" required />
+      </div>
+      <div class="field-group">
+        <label>Password</label>
+        <input type="password" id="loginPass" autocomplete="current-password" placeholder="••••••••" required />
+      </div>
+      <div class="login-error" id="loginError"></div>
+      <button type="submit" class="btn-login">Sign in →</button>
+    </form>
+    <div class="login-footer">Grades 1–8 · English Department</div>
+  </div>
+  <div class="login-panel">
+    <div class="panel-content">
+      <div class="panel-quote">"Every child deserves a champion — an adult who will never give up on them."</div>
+      <div class="panel-attr">— Rita F. Pierson</div>
+    </div>
+  </div>
+</div>
+
+<!-- APP SCREEN -->
+<div id="appScreen" class="screen">
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="sidebar-brand">
+        <span class="brand-mark sm">E</span>
+        <span class="sidebar-brand-text">English Dept.</span>
+      </div>
+      <div class="teacher-badge" id="teacherBadge"></div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="section-label">Filter</div>
+      <select id="gradeFilter" class="grade-select" onchange="filterStudents()">
+        <option value="all">All Grades</option>
+        <option value="1">Grade 1</option>
+        <option value="2">Grade 2</option>
+        <option value="3">Grade 3</option>
+        <option value="4">Grade 4</option>
+        <option value="5">Grade 5</option>
+        <option value="6">Grade 6</option>
+        <option value="7">Grade 7</option>
+        <option value="8">Grade 8</option>
+      </select>
+    </div>
+
+    <div class="sidebar-section grow">
+      <div class="section-label">Students</div>
+      <div class="student-list" id="studentList"></div>
+    </div>
+
+    <div class="sidebar-bottom">
+      <button class="btn-add-student" onclick="openAddStudentModal()">＋ Add student</button>
+      <button class="btn-signout" onclick="signOut()">Sign out</button>
+    </div>
+  </aside>
+
+  <main class="main-area">
+    <div class="main-empty" id="mainEmpty">
+      <div class="empty-icon">◎</div>
+      <div class="empty-title">Select a student</div>
+      <div class="empty-sub">Choose a student from the sidebar to view and update their progress.</div>
+    </div>
+
+    <div class="student-dashboard" id="studentDashboard" style="display:none">
+      <header class="dash-header">
+        <div class="dash-student-info">
+          <div class="dash-avatar" id="dashAvatar"></div>
+          <div>
+            <div class="dash-name" id="dashName"></div>
+            <div class="dash-meta" id="dashMeta"></div>
+          </div>
+        </div>
+        <div class="dash-actions">
+          <button class="btn-report" onclick="openReportModal()" id="reportBtn">⊞ Send Report</button>
+          <button class="btn-danger-sm" onclick="confirmDeleteStudent()" id="deleteBtn">Delete</button>
+        </div>
+      </header>
+
+      <nav class="tab-nav" id="tabNav">
+        <button class="tab active" data-tab="overview" onclick="switchTab('overview')">Overview</button>
+        <button class="tab" data-tab="rt" onclick="switchTab('rt')">Reciprocal Teaching</button>
+        <button class="tab" data-tab="gmt" onclick="switchTab('gmt')">GMT Handwriting</button>
+        <button class="tab" data-tab="projects" onclick="switchTab('projects')">Projects</button>
+        <button class="tab" data-tab="support" onclick="switchTab('support')">Support &amp; Flags</button>
+      </nav>
+
+      <div class="tab-content" id="tabContent"></div>
+    </div>
+  </main>
+</div>
+
+<!-- ADD STUDENT MODAL -->
+<div class="modal-overlay" id="addStudentModal" style="display:none" onclick="closeModal('addStudentModal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title">Add new student</div>
+    <div class="field-group">
+      <label>Full name</label>
+      <input type="text" id="newStudentName" placeholder="e.g. Aanya Sharma" />
+    </div>
+    <div class="field-group">
+      <label>Grade</label>
+      <select id="newStudentGrade">
+        <option value="1">Grade 1</option><option value="2">Grade 2</option>
+        <option value="3">Grade 3</option><option value="4">Grade 4</option>
+        <option value="5">Grade 5</option><option value="6">Grade 6</option>
+        <option value="7">Grade 7</option><option value="8">Grade 8</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal('addStudentModal')">Cancel</button>
+      <button class="btn-primary" onclick="addStudent()">Add student</button>
+    </div>
+  </div>
+</div>
+
+<!-- REPORT MODAL -->
+<div class="modal-overlay" id="reportModal" style="display:none" onclick="closeModal('reportModal')">
+  <div class="modal modal-wide" onclick="event.stopPropagation()">
+    <div class="modal-title">Send Progress Report</div>
+    <div class="modal-body" id="reportPreview"></div>
+    <div class="field-group" style="margin-top:16px">
+      <label>Additional notes (optional)</label>
+      <textarea id="reportNotes" rows="3" placeholder="Any extra context for this report..."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal('reportModal')">Cancel</button>
+      <button class="btn-primary" id="sendReportBtn" onclick="sendReport()">Send to admin →</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DELETE MODAL -->
+<div class="modal-overlay" id="deleteModal" style="display:none" onclick="closeModal('deleteModal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title">Delete student?</div>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">This will permanently remove all data for <strong id="deleteStudentName"></strong>. This cannot be undone.</p>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal('deleteModal')">Cancel</button>
+      <button class="btn-danger" onclick="deleteStudent()">Delete permanently</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/data.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/tabs.js"></script>
+<script src="js/report.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
