@@ -2,15 +2,181 @@
  * tabs.js — renders each dashboard tab
  */
 
+// ── CDC Nepal Curriculum Data ─────────────────────────────────────────────────
+
+const CDC_CURRICULUM = {
+  // Grades 1-3: Integrated/Transdisciplinary
+  1: {
+    level: 'Primary (Grade 1)',
+    approach: 'Transdisciplinary — all subjects taught through common themes',
+    themes: [
+      { id:'t1', name:'Me and My Family', desc:'Personal identity and family roles.', subjects:['English','Nepali','Math','Our Surroundings'] },
+      { id:'t2', name:'My Daily Life', desc:'Routine, habits, and time management.', subjects:['English','Nepali','Math'] },
+      { id:'t3', name:'Our Community', desc:'Neighbourhood, local helpers, and social harmony.', subjects:['English','Nepali','Our Surroundings'] },
+      { id:'t4', name:'Our School', desc:'Learning environment and school rules.', subjects:['English','Nepali'] },
+      { id:'t5', name:'Our Environment', desc:'Weather, plants, and local geography.', subjects:['English','Our Surroundings'] },
+      { id:'t6', name:'My Belongings', desc:'Personal items and taking care of things.', subjects:['English','Nepali'] },
+      { id:'t7', name:'Our Culture', desc:'Festivals, traditions, and local customs.', subjects:['English','Nepali','Our Surroundings'] },
+      { id:'t8', name:'Communication, Technology and Market', desc:'Basic tools and buying/selling.', subjects:['English','Math','Our Surroundings'] },
+      { id:'t9', name:'Fruits and Vegetables', desc:'Nutrition and farming.', subjects:['English','Our Surroundings'] },
+      { id:'t10', name:'Birds and Animals', desc:'Wildlife and domestic animals.', subjects:['English','Our Surroundings'] },
+      { id:'t11', name:'Hobbies and Interests', desc:'Creative arts and physical activities.', subjects:['English','Nepali'] },
+    ]
+  },
+  2: {
+    level: 'Primary (Grade 2)',
+    approach: 'Transdisciplinary — all subjects taught through common themes',
+    themes: [
+      { id:'t1', name:'Me and My Family', desc:'Personal identity and family roles.', subjects:['English','Nepali','Math','Our Surroundings'] },
+      { id:'t2', name:'My Daily Life', desc:'Routine, habits, and time management.', subjects:['English','Nepali','Math'] },
+      { id:'t3', name:'Our Community', desc:'Neighbourhood, local helpers, and social harmony.', subjects:['English','Nepali','Our Surroundings'] },
+      { id:'t4', name:'Our School', desc:'Learning environment and school rules.', subjects:['English','Nepali'] },
+      { id:'t5', name:'Our Environment', desc:'Weather, plants, and local geography.', subjects:['English','Our Surroundings'] },
+      { id:'t6', name:'My Belongings', desc:'Personal items and taking care of things.', subjects:['English','Nepali'] },
+      { id:'t7', name:'Our Culture', desc:'Festivals, traditions, and local customs.', subjects:['English','Nepali','Our Surroundings'] },
+      { id:'t8', name:'Communication, Technology and Market', desc:'Basic tools and buying/selling.', subjects:['English','Math','Our Surroundings'] },
+      { id:'t9', name:'Fruits and Vegetables', desc:'Nutrition and farming.', subjects:['English','Our Surroundings'] },
+      { id:'t10', name:'Birds and Animals', desc:'Wildlife and domestic animals.', subjects:['English','Our Surroundings'] },
+      { id:'t11', name:'Hobbies and Interests', desc:'Creative arts and physical activities.', subjects:['English','Nepali'] },
+    ]
+  },
+  3: {
+    level: 'Primary (Grade 3)',
+    approach: 'Transdisciplinary — all subjects taught through common themes',
+    themes: [
+      { id:'t1', name:'Me and My Family', desc:'Personal identity and family roles.', subjects:['English','Nepali','Math','Our Surroundings'] },
+      { id:'t2', name:'My Daily Life', desc:'Routine, habits, and time management.', subjects:['English','Nepali','Math'] },
+      { id:'t3', name:'Our Community', desc:'Neighbourhood, local helpers, and social harmony.', subjects:['English','Nepali','Our Surroundings'] },
+      { id:'t4', name:'Our School', desc:'Learning environment and school rules.', subjects:['English','Nepali'] },
+      { id:'t5', name:'Our Environment', desc:'Weather, plants, and local geography.', subjects:['English','Our Surroundings'] },
+      { id:'t6', name:'My Belongings', desc:'Personal items and taking care of things.', subjects:['English','Nepali'] },
+      { id:'t7', name:'Our Culture', desc:'Festivals, traditions, and local customs.', subjects:['English','Nepali','Our Surroundings'] },
+      { id:'t8', name:'Communication, Technology and Market', desc:'Basic tools and buying/selling.', subjects:['English','Math','Our Surroundings'] },
+      { id:'t9', name:'Fruits and Vegetables', desc:'Nutrition and farming.', subjects:['English','Our Surroundings'] },
+      { id:'t10', name:'Birds and Animals', desc:'Wildlife and domestic animals.', subjects:['English','Our Surroundings'] },
+      { id:'t11', name:'Hobbies and Interests', desc:'Creative arts and physical activities.', subjects:['English','Nepali'] },
+    ]
+  },
+  // Grades 4-5: Subject-Based/Multidisciplinary
+  4: {
+    level: 'Primary (Grade 4)',
+    approach: 'Multidisciplinary — themes shared across subjects',
+    themes: [
+      { id:'ef1', name:'Family and Friends', desc:'Relationships and social interaction.', subjects:['English','Nepali'] },
+      { id:'ef2', name:'Health and Hygiene', desc:'Personal wellness and cleanliness.', subjects:['English','Nepali','Science'] },
+      { id:'ef3', name:'Our Identity', desc:'National symbols, biography, and self.', subjects:['English','Nepali','Social Studies'] },
+      { id:'ef4', name:'Work and Leisure', desc:'Professional life and sports.', subjects:['English','Nepali'] },
+      { id:'ef5', name:'Ethics and Values', desc:'Moral stories and social responsibility.', subjects:['English','Nepali'] },
+      { id:'ss1', name:'Living Things', desc:'Classification of plants and animals.', subjects:['Science','Social Studies'] },
+      { id:'ss2', name:'Energy and Matter', desc:'Basics of heat, light, and states of matter.', subjects:['Science'] },
+      { id:'ss3', name:'Our Earth', desc:'Soil, rocks, and environmental conservation.', subjects:['Science','Social Studies'] },
+      { id:'ss4', name:'Map Work', desc:'Understanding basic maps and direction.', subjects:['Social Studies'] },
+      { id:'ss5', name:'History', desc:'Local history and significant national figures.', subjects:['Social Studies'] },
+    ]
+  },
+  5: {
+    level: 'Primary (Grade 5)',
+    approach: 'Multidisciplinary — themes shared across subjects',
+    themes: [
+      { id:'ef1', name:'Family and Friends', desc:'Relationships and social interaction.', subjects:['English','Nepali'] },
+      { id:'ef2', name:'Health and Hygiene', desc:'Personal wellness and cleanliness.', subjects:['English','Nepali','Science'] },
+      { id:'ef3', name:'Our Identity', desc:'National symbols, biography, and self.', subjects:['English','Nepali','Social Studies'] },
+      { id:'ef4', name:'Work and Leisure', desc:'Professional life and sports.', subjects:['English','Nepali'] },
+      { id:'ef5', name:'Ethics and Values', desc:'Moral stories and social responsibility.', subjects:['English','Nepali'] },
+      { id:'ss1', name:'Living Things', desc:'Classification of plants and animals.', subjects:['Science','Social Studies'] },
+      { id:'ss2', name:'Energy and Matter', desc:'Basics of heat, light, and states of matter.', subjects:['Science'] },
+      { id:'ss3', name:'Our Earth', desc:'Soil, rocks, and environmental conservation.', subjects:['Science','Social Studies'] },
+      { id:'ss4', name:'Map Work', desc:'Understanding basic maps and direction.', subjects:['Social Studies'] },
+      { id:'ss5', name:'History', desc:'Local history and significant national figures.', subjects:['Social Studies'] },
+    ]
+  },
+  // Grades 6-8: Disciplinary/Subject-specific
+  6: {
+    level: 'Basic Level (Grade 6)',
+    approach: 'Disciplinary — subject-specific themes bridging toward secondary',
+    themes: [
+      { id:'en1', name:'Personal Identity and Biography', desc:'Self-reflection and life stories.', subjects:['English'] },
+      { id:'en2', name:'Travel and Tourism', desc:'Destinations, itineraries, and culture.', subjects:['English'] },
+      { id:'en3', name:'Science and Technology', desc:'Innovations and modern gadgets.', subjects:['English','Science'] },
+      { id:'en4', name:'Environment and Health', desc:'Climate change, diseases, and wellness.', subjects:['English','Science'] },
+      { id:'en5', name:'Folktales and Literature', desc:'Myths, legends, and creative writing.', subjects:['English'] },
+      { id:'en6', name:'Mass Media and Communication', desc:'News, advertisements, and digital citizenship.', subjects:['English'] },
+      { id:'en7', name:'Democracy and Human Rights', desc:'Social justice and governance.', subjects:['English','Social Studies'] },
+      { id:'sl1', name:'We, Our Community, and Nation', desc:'Social issues and solutions.', subjects:['Social Studies'] },
+      { id:'sl2', name:'Our Traditions and Heritage', desc:'Ethnic diversity and national pride.', subjects:['Social Studies'] },
+      { id:'sl3', name:'Civic Sense', desc:'Rights, duties, and the constitution.', subjects:['Social Studies'] },
+      { id:'sl4', name:'International Relations', desc:'Nepal and its neighbors (SAARC/UN).', subjects:['Social Studies'] },
+      { id:'sc1', name:'Biology — Cells and Human Body', desc:'Cell structure, digestive and respiratory systems.', subjects:['Science'] },
+      { id:'sc2', name:'Physics — Measurement and Force', desc:'Measurement, force, pressure, and magnetism.', subjects:['Science'] },
+      { id:'sc3', name:'Chemistry — Elements and Compounds', desc:'Elements, compounds, and chemical reactions.', subjects:['Science'] },
+      { id:'sc4', name:'Astronomy', desc:'The Solar System and the universe.', subjects:['Science'] },
+    ]
+  },
+  7: {
+    level: 'Basic Level (Grade 7)',
+    approach: 'Disciplinary — subject-specific themes bridging toward secondary',
+    themes: [
+      { id:'en1', name:'Personal Identity and Biography', desc:'Self-reflection and life stories.', subjects:['English'] },
+      { id:'en2', name:'Travel and Tourism', desc:'Destinations, itineraries, and culture.', subjects:['English'] },
+      { id:'en3', name:'Science and Technology', desc:'Innovations and modern gadgets.', subjects:['English','Science'] },
+      { id:'en4', name:'Environment and Health', desc:'Climate change, diseases, and wellness.', subjects:['English','Science'] },
+      { id:'en5', name:'Folktales and Literature', desc:'Myths, legends, and creative writing.', subjects:['English'] },
+      { id:'en6', name:'Mass Media and Communication', desc:'News, advertisements, and digital citizenship.', subjects:['English'] },
+      { id:'en7', name:'Democracy and Human Rights', desc:'Social justice and governance.', subjects:['English','Social Studies'] },
+      { id:'sl1', name:'We, Our Community, and Nation', desc:'Social issues and solutions.', subjects:['Social Studies'] },
+      { id:'sl2', name:'Our Traditions and Heritage', desc:'Ethnic diversity and national pride.', subjects:['Social Studies'] },
+      { id:'sl3', name:'Civic Sense', desc:'Rights, duties, and the constitution.', subjects:['Social Studies'] },
+      { id:'sl4', name:'International Relations', desc:'Nepal and its neighbors (SAARC/UN).', subjects:['Social Studies'] },
+      { id:'sc1', name:'Biology — Cells and Human Body', desc:'Cell structure, digestive and respiratory systems.', subjects:['Science'] },
+      { id:'sc2', name:'Physics — Measurement and Force', desc:'Measurement, force, pressure, and magnetism.', subjects:['Science'] },
+      { id:'sc3', name:'Chemistry — Elements and Compounds', desc:'Elements, compounds, and chemical reactions.', subjects:['Science'] },
+      { id:'sc4', name:'Astronomy', desc:'The Solar System and the universe.', subjects:['Science'] },
+    ]
+  },
+  8: {
+    level: 'Basic Level (Grade 8)',
+    approach: 'Disciplinary — subject-specific themes bridging toward secondary',
+    themes: [
+      { id:'en1', name:'Personal Identity and Biography', desc:'Self-reflection and life stories.', subjects:['English'] },
+      { id:'en2', name:'Travel and Tourism', desc:'Destinations, itineraries, and culture.', subjects:['English'] },
+      { id:'en3', name:'Science and Technology', desc:'Innovations and modern gadgets.', subjects:['English','Science'] },
+      { id:'en4', name:'Environment and Health', desc:'Climate change, diseases, and wellness.', subjects:['English','Science'] },
+      { id:'en5', name:'Folktales and Literature', desc:'Myths, legends, and creative writing.', subjects:['English'] },
+      { id:'en6', name:'Mass Media and Communication', desc:'News, advertisements, and digital citizenship.', subjects:['English'] },
+      { id:'en7', name:'Democracy and Human Rights', desc:'Social justice and governance.', subjects:['English','Social Studies'] },
+      { id:'sl1', name:'We, Our Community, and Nation', desc:'Social issues and solutions.', subjects:['Social Studies'] },
+      { id:'sl2', name:'Our Traditions and Heritage', desc:'Ethnic diversity and national pride.', subjects:['Social Studies'] },
+      { id:'sl3', name:'Civic Sense', desc:'Rights, duties, and the constitution.', subjects:['Social Studies'] },
+      { id:'sl4', name:'International Relations', desc:'Nepal and its neighbors (SAARC/UN).', subjects:['Social Studies'] },
+      { id:'sc1', name:'Biology — Cells and Human Body', desc:'Cell structure, digestive and respiratory systems.', subjects:['Science'] },
+      { id:'sc2', name:'Physics — Measurement and Force', desc:'Measurement, force, pressure, and magnetism.', subjects:['Science'] },
+      { id:'sc3', name:'Chemistry — Elements and Compounds', desc:'Elements, compounds, and chemical reactions.', subjects:['Science'] },
+      { id:'sc4', name:'Astronomy', desc:'The Solar System and the universe.', subjects:['Science'] },
+    ]
+  }
+};
+
+const SUBJECT_COLORS = {
+  'English':        ['#EBF0FE','#2B5CE6'],
+  'Nepali':         ['#FEF3E0','#9B6200'],
+  'Math':           ['#E6F5EB','#2D7D46'],
+  'Our Surroundings':['#F3EDFC','#6B3FA0'],
+  'Science':        ['#E0F4F4','#1A7A7A'],
+  'Social Studies': ['#FFF0F5','#A0306A'],
+};
+
+// ── Tab Router ────────────────────────────────────────────────────────────────
+
 function renderTabContent() {
   if (!selectedStudentId) return;
   const s = getStudent(selectedStudentId);
   const c = document.getElementById('tabContent');
-  if (currentTab === 'overview')  renderOverview(s, c);
-  else if (currentTab === 'rt')   renderRT(s, c);
-  else if (currentTab === 'gmt')  renderGMT(s, c);
+  if (currentTab === 'overview')    renderOverview(s, c);
+  else if (currentTab === 'rt')     renderRT(s, c);
+  else if (currentTab === 'gmt')    renderGMT(s, c);
   else if (currentTab === 'projects') renderProjects(s, c);
   else if (currentTab === 'support')  renderSupport(s, c);
+  else if (currentTab === 'cdc')    renderCDC(s, c);
 }
 
 /* ── OVERVIEW ── */
@@ -19,13 +185,16 @@ function renderOverview(s, c) {
   const gm = gmtMasteredCount(s);
   const fc = Object.values(s.flags).filter(Boolean).length;
   const ra = rtAverage(s);
+  const curr = CDC_CURRICULUM[s.grade];
+  const totalThemes = curr ? curr.themes.length : 0;
+  const coveredThemes = curr ? curr.themes.filter(t => s.cdcProgress && s.cdcProgress[t.id] === 'covered').length : 0;
 
   c.innerHTML = `
   <div class="grid-4">
     <div class="stat-card"><div class="stat-label">RT Average</div><div class="stat-value">${ra}</div><div class="stat-sub">out of 4.0</div></div>
     <div class="stat-card"><div class="stat-label">Projects</div><div class="stat-value">${pd}<span style="font-size:16px;color:var(--text-faint)">/6</span></div><div class="stat-sub">completed</div></div>
     <div class="stat-card"><div class="stat-label">Letters mastered</div><div class="stat-value">${gm}</div><div class="stat-sub">across all types</div></div>
-    <div class="stat-card"><div class="stat-label">Active flags</div><div class="stat-value" style="color:${fc>0?'var(--red)':'var(--text)'}">${fc}</div><div class="stat-sub">${fc>0?'needs attention':'all clear'}</div></div>
+    <div class="stat-card"><div class="stat-label">CDC Themes</div><div class="stat-value">${coveredThemes}<span style="font-size:16px;color:var(--text-faint)">/${totalThemes}</span></div><div class="stat-sub">covered</div></div>
   </div>
   <div class="grid-2">
     <div class="card">
@@ -267,6 +436,84 @@ function addIntervention() {
 function deleteIntervention(idx) {
   const s = getStudent(selectedStudentId);
   s.interventions.splice(idx, 1);
+  saveStudents();
+  renderTabContent();
+}
+
+/* ── CDC CURRICULUM ── */
+function renderCDC(s, c) {
+  const curr = CDC_CURRICULUM[s.grade];
+  if (!curr) {
+    c.innerHTML = `<div class="card"><p style="color:var(--text-muted)">No CDC curriculum data available for this grade.</p></div>`;
+    return;
+  }
+
+  if (!s.cdcProgress) s.cdcProgress = {};
+  const covered = curr.themes.filter(t => s.cdcProgress[t.id] === 'covered').length;
+  const inProgress = curr.themes.filter(t => s.cdcProgress[t.id] === 'in-progress').length;
+  const pct = Math.round((covered / curr.themes.length) * 100);
+
+  // Group themes by subject for Grades 4-8
+  const isIntegrated = s.grade <= 3;
+
+  c.innerHTML = `
+  <div class="card" style="margin-bottom:14px">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <div>
+        <div class="card-title" style="margin-bottom:2px">CDC Nepal — ${curr.level}</div>
+        <div style="font-size:12px;color:var(--text-muted)">${curr.approach}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:22px;font-weight:700;color:var(--accent)">${pct}%</div>
+        <div style="font-size:11px;color:var(--text-faint)">${covered} covered · ${inProgress} in progress</div>
+      </div>
+    </div>
+    <div class="prog-wrap" style="margin-top:12px">
+      <div class="prog-bar" style="width:${pct}%;background:var(--accent)"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" style="margin-bottom:12px">
+      Theme Tracker
+      <span class="hint">Click to cycle: not started → in progress → covered</span>
+    </div>
+    ${curr.themes.map((t, i) => {
+      const status = s.cdcProgress[t.id] || 'none';
+      const statusColors = {
+        none: { bg:'var(--surface-2)', border:'var(--border)', text:'var(--text-faint)', label:'Not started' },
+        'in-progress': { bg:'#FEF3E0', border:'#E6A82A', text:'#9B6200', label:'In progress' },
+        covered: { bg:'#E6F5EB', border:'#5BBF7A', text:'#2D7D46', label:'Covered ✓' }
+      };
+      const sc = statusColors[status];
+      return `
+      <div class="cdc-theme-item" onclick="cycleCDCTheme('${t.id}')" style="cursor:pointer;padding:12px;border-radius:8px;border:1.5px solid ${sc.border};background:${sc.bg};margin-bottom:8px;transition:all 0.15s">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:500;margin-bottom:3px">${i+1}. ${t.name}</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px">${t.desc}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:4px">
+              ${t.subjects.map(sub => {
+                const sc2 = SUBJECT_COLORS[sub] || ['#f0f0f0','#555'];
+                return `<span style="font-size:10px;padding:2px 7px;border-radius:20px;background:${sc2[0]};color:${sc2[1]};font-weight:500">${sub}</span>`;
+              }).join('')}
+            </div>
+          </div>
+          <div style="font-size:11px;font-weight:500;color:${sc.text};white-space:nowrap;padding:3px 8px;border-radius:20px;background:white;border:1px solid ${sc.border}">${sc.label}</div>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function cycleCDCTheme(themeId) {
+  const s = getStudent(selectedStudentId);
+  if (!s.cdcProgress) s.cdcProgress = {};
+  const states = ['none', 'in-progress', 'covered'];
+  const cur = s.cdcProgress[themeId] || 'none';
+  const next = states[(states.indexOf(cur) + 1) % states.length];
+  if (next === 'none') delete s.cdcProgress[themeId];
+  else s.cdcProgress[themeId] = next;
   saveStudents();
   renderTabContent();
 }
