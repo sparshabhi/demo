@@ -173,10 +173,37 @@ function handleImportFile(e) {
   }
 }
 
+// Convert grade words like "One (Danphe)" or "Three" to numbers
+function gradeWordToNumber(raw) {
+  const words = { one:1, two:2, three:3, four:4, five:5, six:6, seven:7, eight:8 };
+  const lower = raw.toLowerCase().trim();
+  // Try direct number first
+  const num = parseInt(lower);
+  if (!isNaN(num)) return num;
+  // Try matching word at start of string
+  for (const [word, val] of Object.entries(words)) {
+    if (lower.startsWith(word)) return val;
+  }
+  return NaN;
+}
+
 function parseCSV(text) {
-  return text.trim().split('\n').map(line =>
-    line.split(',').map(cell => cell.trim().replace(/^"|"$/g, ''))
-  );
+  // Handle quoted fields properly
+  const rows = [];
+  const lines = text.trim().split('\n');
+  for (const line of lines) {
+    const cells = [];
+    let inQuote = false, cell = '';
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') { inQuote = !inQuote; }
+      else if (ch === ',' && !inQuote) { cells.push(cell.trim()); cell = ''; }
+      else { cell += ch; }
+    }
+    cells.push(cell.trim());
+    rows.push(cells);
+  }
+  return rows;
 }
 
 function showImportPreview(rows, status, preview, confirmBtn) {
@@ -186,10 +213,14 @@ function showImportPreview(rows, status, preview, confirmBtn) {
     return;
   }
 
-  // Detect header row — look for "name" and "grade" columns
+  // Detect header row — look for name and grade columns
   const header = rows[0].map(h => h.toLowerCase().trim());
-  const nameIdx = header.findIndex(h => h.includes('name'));
-  const gradeIdx = header.findIndex(h => h.includes('grade'));
+  // Accept "student name" or "name"
+  const nameIdx = header.findIndex(h => h.includes('student name') || h === 'name');
+  const gradeIdx = header.findIndex(h => h === 'grade' || h.startsWith('grade'));
+  const guardianIdx = header.findIndex(h => h.includes('guardian'));
+  const genderIdx = header.findIndex(h => h.includes('gender'));
+  const rollIdx = header.findIndex(h => h.includes('roll'));
 
   if (nameIdx === -1 || gradeIdx === -1) {
     status.textContent = '❌ Could not find "Name" and "Grade" columns. Please check your file.';
@@ -203,13 +234,16 @@ function showImportPreview(rows, status, preview, confirmBtn) {
   rows.slice(1).forEach((row, i) => {
     const name = (row[nameIdx] || '').trim();
     const gradeRaw = (row[gradeIdx] || '').toString().trim();
-    const grade = parseInt(gradeRaw);
+    const grade = gradeWordToNumber(gradeRaw);
+    const guardian = guardianIdx !== -1 ? (row[guardianIdx] || '').trim() : '';
+    const gender = genderIdx !== -1 ? (row[genderIdx] || '').trim() : '';
+    const roll = rollIdx !== -1 ? (row[rollIdx] || '').trim() : '';
 
     if (!name) { skipped.push(`Row ${i+2}: empty name`); return; }
     if (isNaN(grade) || grade < 1 || grade > 8) { skipped.push(`Row ${i+2}: invalid grade "${gradeRaw}"`); return; }
     if (!canAccessGrade(grade)) { skipped.push(`Row ${i+2}: ${name} (Grade ${grade}) — no access`); return; }
 
-    parsed.push({ name, grade });
+    parsed.push({ name, grade, guardian, gender, roll });
   });
 
   window._importParsed = parsed;
@@ -224,11 +258,18 @@ function showImportPreview(rows, status, preview, confirmBtn) {
   let html = `<div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">Found <strong>${parsed.length}</strong> student${parsed.length>1?'s':''} to import${skipped.length ? ` · ${skipped.length} row(s) skipped` : ''}:</div>`;
   html += `<div style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:8px">`;
   html += `<table style="width:100%;border-collapse:collapse;font-size:13px">`;
-  html += `<thead><tr style="background:var(--surface-2)"><th style="padding:6px 12px;text-align:left">Name</th><th style="padding:6px 12px;text-align:left">Grade</th></tr></thead><tbody>`;
+  html += `<thead><tr style="background:var(--surface-2)">
+    <th style="padding:6px 12px;text-align:left">Name</th>
+    <th style="padding:6px 12px;text-align:left">Grade</th>
+    ${parsed[0].gender ? '<th style="padding:6px 12px;text-align:left">Gender</th>' : ''}
+    ${parsed[0].guardian ? '<th style="padding:6px 12px;text-align:left">Guardian</th>' : ''}
+  </tr></thead><tbody>`;
   parsed.forEach((s, i) => {
     html += `<tr style="border-top:1px solid var(--border);background:${i%2===0?'var(--surface)':'var(--surface-2)'}">
       <td style="padding:6px 12px">${s.name}</td>
       <td style="padding:6px 12px">Grade ${s.grade}</td>
+      ${s.gender ? `<td style="padding:6px 12px">${s.gender}</td>` : ''}
+      ${s.guardian ? `<td style="padding:6px 12px;font-size:11px">${s.guardian}</td>` : ''}
     </tr>`;
   });
   html += `</tbody></table></div>`;
@@ -249,12 +290,16 @@ function confirmImport() {
   let added = 0;
   let dupes = 0;
 
-  parsed.forEach(({ name, grade }) => {
+  parsed.forEach(({ name, grade, guardian, gender, roll }) => {
     const exists = students.some(s =>
       s.name.toLowerCase() === name.toLowerCase() && s.grade === grade
     );
     if (exists) { dupes++; return; }
-    students.push(makeStudent(name, grade));
+    const s = makeStudent(name, grade);
+    if (guardian) s.guardian = guardian;
+    if (gender) s.gender = gender;
+    if (roll) s.roll = roll;
+    students.push(s);
     added++;
   });
 
