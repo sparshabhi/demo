@@ -75,6 +75,7 @@
 
     <div class="sidebar-bottom">
       <button class="btn-add-student" onclick="openAddStudentModal()">＋ Add student</button>
+      <button class="btn-add-student" onclick="openImportModal()" style="margin-top:6px;background:var(--surface-2)">⬆ Import CSV / Excel</button>
       <button class="btn-signout" onclick="signOut()">Sign out</button>
     </div>
   </aside>
@@ -138,6 +139,31 @@
   </div>
 </div>
 
+<!-- IMPORT MODAL -->
+<div class="modal-overlay" id="importModal" style="display:none" onclick="closeModal('importModal')">
+  <div class="modal modal-wide" onclick="event.stopPropagation()">
+    <div class="modal-title">Import students from CSV / Excel</div>
+
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.6">
+      Upload a <strong>.csv</strong> or <strong>.xlsx</strong> file with columns named <strong>Name</strong> and <strong>Grade</strong>.<br>
+      Example: <code style="background:var(--surface-2);padding:2px 6px;border-radius:4px">Name, Grade</code> → <code style="background:var(--surface-2);padding:2px 6px;border-radius:4px">Ram Bahadur, 3</code>
+    </div>
+
+    <div class="field-group">
+      <label>Choose file</label>
+      <input type="file" id="importFile" accept=".csv,.xlsx,.xls" onchange="handleImportFile(event)" style="font-size:13px;padding:8px" />
+    </div>
+
+    <div id="importStatus" style="font-size:13px;margin-top:8px"></div>
+    <div id="importPreview" style="margin-top:12px"></div>
+
+    <div class="modal-footer" style="margin-top:16px">
+      <button class="btn-ghost" onclick="closeModal('importModal')">Cancel</button>
+      <button class="btn-primary" id="importConfirmBtn" style="display:none" onclick="confirmImport()">Import students</button>
+    </div>
+  </div>
+</div>
+
 <!-- REPORT MODAL -->
 <div class="modal-overlay" id="reportModal" style="display:none" onclick="closeModal('reportModal')">
   <div class="modal modal-wide" onclick="event.stopPropagation()">
@@ -171,6 +197,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
 <script src="config.js"></script>
 <script src="data.js"></script>
 <script src="auth.js"></script>

@@ -1,5 +1,5 @@
 /**
- * data.js — student data model, localStorage persistence
+ * data.js — student data model, localStorage persistence, CSV/Excel import
  */
 
 const AVATAR_COLORS = [
@@ -119,4 +119,150 @@ function gmtMasteredCount(s) {
 
 function projectsDoneCount(s) {
   return PROJECTS.filter(p => s.projects[p.id]).length;
+}
+
+// ── CSV / Excel Import ────────────────────────────────────────────────────────
+
+function openImportModal() {
+  document.getElementById('importModal').style.display = 'flex';
+  document.getElementById('importFile').value = '';
+  document.getElementById('importPreview').innerHTML = '';
+  document.getElementById('importConfirmBtn').style.display = 'none';
+  document.getElementById('importStatus').textContent = '';
+  window._importParsed = [];
+}
+
+function handleImportFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const ext = file.name.split('.').pop().toLowerCase();
+  const status = document.getElementById('importStatus');
+  const preview = document.getElementById('importPreview');
+  const confirmBtn = document.getElementById('importConfirmBtn');
+
+  preview.innerHTML = '';
+  confirmBtn.style.display = 'none';
+  window._importParsed = [];
+
+  if (ext === 'csv') {
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      const rows = parseCSV(ev.target.result);
+      showImportPreview(rows, status, preview, confirmBtn);
+    };
+    reader.readAsText(file);
+  } else if (ext === 'xlsx' || ext === 'xls') {
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      try {
+        const data = new Uint8Array(ev.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        showImportPreview(rows, status, preview, confirmBtn);
+      } catch(err) {
+        status.textContent = '❌ Could not read Excel file. Please check the format.';
+        status.style.color = 'var(--danger)';
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  } else {
+    status.textContent = '❌ Please upload a .csv or .xlsx file.';
+    status.style.color = 'var(--danger)';
+  }
+}
+
+function parseCSV(text) {
+  return text.trim().split('\n').map(line =>
+    line.split(',').map(cell => cell.trim().replace(/^"|"$/g, ''))
+  );
+}
+
+function showImportPreview(rows, status, preview, confirmBtn) {
+  if (!rows || rows.length < 2) {
+    status.textContent = '❌ File appears empty or invalid.';
+    status.style.color = 'var(--danger)';
+    return;
+  }
+
+  // Detect header row — look for "name" and "grade" columns
+  const header = rows[0].map(h => h.toLowerCase().trim());
+  const nameIdx = header.findIndex(h => h.includes('name'));
+  const gradeIdx = header.findIndex(h => h.includes('grade'));
+
+  if (nameIdx === -1 || gradeIdx === -1) {
+    status.textContent = '❌ Could not find "Name" and "Grade" columns. Please check your file.';
+    status.style.color = 'var(--danger)';
+    return;
+  }
+
+  const parsed = [];
+  const skipped = [];
+
+  rows.slice(1).forEach((row, i) => {
+    const name = (row[nameIdx] || '').trim();
+    const gradeRaw = (row[gradeIdx] || '').toString().trim();
+    const grade = parseInt(gradeRaw);
+
+    if (!name) { skipped.push(`Row ${i+2}: empty name`); return; }
+    if (isNaN(grade) || grade < 1 || grade > 8) { skipped.push(`Row ${i+2}: invalid grade "${gradeRaw}"`); return; }
+    if (!canAccessGrade(grade)) { skipped.push(`Row ${i+2}: ${name} (Grade ${grade}) — no access`); return; }
+
+    parsed.push({ name, grade });
+  });
+
+  window._importParsed = parsed;
+
+  if (parsed.length === 0) {
+    status.textContent = '❌ No valid students found in file.';
+    status.style.color = 'var(--danger)';
+    return;
+  }
+
+  // Show preview table
+  let html = `<div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">Found <strong>${parsed.length}</strong> student${parsed.length>1?'s':''} to import${skipped.length ? ` · ${skipped.length} row(s) skipped` : ''}:</div>`;
+  html += `<div style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:8px">`;
+  html += `<table style="width:100%;border-collapse:collapse;font-size:13px">`;
+  html += `<thead><tr style="background:var(--surface-2)"><th style="padding:6px 12px;text-align:left">Name</th><th style="padding:6px 12px;text-align:left">Grade</th></tr></thead><tbody>`;
+  parsed.forEach((s, i) => {
+    html += `<tr style="border-top:1px solid var(--border);background:${i%2===0?'var(--surface)':'var(--surface-2)'}">
+      <td style="padding:6px 12px">${s.name}</td>
+      <td style="padding:6px 12px">Grade ${s.grade}</td>
+    </tr>`;
+  });
+  html += `</tbody></table></div>`;
+
+  if (skipped.length) {
+    html += `<div style="font-size:11px;color:var(--text-faint);margin-top:6px">Skipped: ${skipped.join(' · ')}</div>`;
+  }
+
+  preview.innerHTML = html;
+  confirmBtn.style.display = '';
+  status.textContent = '';
+}
+
+function confirmImport() {
+  const parsed = window._importParsed || [];
+  if (!parsed.length) return;
+
+  let added = 0;
+  let dupes = 0;
+
+  parsed.forEach(({ name, grade }) => {
+    const exists = students.some(s =>
+      s.name.toLowerCase() === name.toLowerCase() && s.grade === grade
+    );
+    if (exists) { dupes++; return; }
+    students.push(makeStudent(name, grade));
+    added++;
+  });
+
+  saveStudents();
+  closeModal('importModal');
+  renderSidebar();
+
+  let msg = `${added} student${added!==1?'s':''} imported`;
+  if (dupes) msg += ` · ${dupes} duplicate${dupes!==1?'s':''} skipped`;
+  showToast(msg);
 }
