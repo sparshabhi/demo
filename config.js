@@ -1,36 +1,7 @@
 /**
  * ╔══════════════════════════════════════════════════════════════╗
  * ║  ENGLISH DEPT. TRACKER — CONFIGURATION FILE                 ║
- * ║                                                              ║
- * ║  Edit this file to:                                          ║
- * ║    1. Set your admin email (where reports are sent)          ║
- * ║    2. Add/remove teacher accounts                            ║
- * ║    3. Enter your EmailJS credentials                         ║
  * ╚══════════════════════════════════════════════════════════════╝
- *
- * SETUP INSTRUCTIONS:
- *
- * STEP 1 — EmailJS (free, takes ~5 minutes):
- *   a. Sign up at https://emailjs.com
- *   b. Add Gmail as an email service → copy the Service ID below
- *   c. Create an email template → copy the Template ID below
- *      Use these template variables: {{to_email}}, {{from_name}},
- *      {{student_name}}, {{report_body}}, {{extra_notes}}
- *   d. Copy your Public Key from Account > API Keys
- *
- * STEP 2 — Teacher passwords:
- *   Passwords below are stored as SHA-256 hashes for safety.
- *   To generate a hash for a new password, open browser console and run:
- *     hashPassword('yourpassword').then(console.log)
- *   Then paste the result into the teachers array below.
- *
- *   DEFAULT CREDENTIALS (change these before deploying!):
- *     admin    / admin123
- *     teacher1 / teach2024
- *     teacher2 / teach2024
- *     teacher3 / teach2024
- *     teacher4 / teach2024
- *     teacher5 / teach2024
  */
 
 const CONFIG = {
@@ -46,9 +17,6 @@ const CONFIG = {
   },
 
   // ── Teacher accounts ─────────────────────────────────────────
-  // grades: array of grade numbers this teacher can access.
-  // Use [1,2,3,4,5,6,7,8] for full access (admin).
-  // passwordHash: SHA-256 of their password (hex string).
   teachers: [
     {
       username: 'saugat',
@@ -64,56 +32,63 @@ const CONFIG = {
       grades: [1],
       isAdmin: false,
       // Password: teach2026
-      passwordHash: 'b9c950640b1e23e09b5a2cfd6b04b22b1a3d2d0f0dd67c7b68a0d8f1e2c3d4e5'
+      passwordHash: 'f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9'
     },
     {
       username: 'Grade2',
       displayName: 'Grade 2',
       grades: [2],
       isAdmin: false,
-      passwordHash: 'b9c950640b1e23e09b5a2cfd6b04b22b1a3d2d0f0dd67c7b68a0d8f1e2c3d4e5'
+      // Password: teach2026
+      passwordHash: 'f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9'
     },
     {
       username: 'teacher3',
-      displayName: 'teacher3',
+      displayName: 'Grade 3',
       grades: [3],
       isAdmin: false,
-      passwordHash: 'b9c950640b1e23e09b5a2cfd6b04b22b1a3d2d0f0dd67c7b68a0d8f1e2c3d4e5'
+      // Password: teach2026
+      passwordHash: 'f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9'
     },
     {
       username: 'teacher4',
-      displayName: 'teacher4',
+      displayName: 'Grade 4',
       grades: [4],
       isAdmin: false,
-      passwordHash: 'b9c950640b1e23e09b5a2cfd6b04b22b1a3d2d0f0dd67c7b68a0d8f1e2c3d4e5'
+      // Password: teach2026
+      passwordHash: 'f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9'
     },
     {
       username: 'teacher5',
-      displayName: ',
+      displayName: 'Grade 5',
       grades: [5],
       isAdmin: false,
-      passwordHash: 'b9c950640b1e23e09b5a2cfd6b04b22b1a3d2d0f0dd67c7b68a0d8f1e2c3d4e5'
+      // Password: teach2026
+      passwordHash: 'f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9'
     },
     {
       username: 'teacher6',
-      displayName: 'teacher6',
+      displayName: 'Grade 6',
       grades: [6],
       isAdmin: false,
-      passwordHash: 'b9c950640b1e23e09b5a2cfd6b04b22b1a3d2d0f0dd67c7b68a0d8f1e2c3d4e5'
+      // Password: teach2026
+      passwordHash: 'f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9'
     },
     {
       username: 'teacher7',
-      displayName: 'teacher7',
+      displayName: 'Grade 7',
       grades: [7],
       isAdmin: false,
-      passwordHash: 'b9c950640b1e23e09b5a2cfd6b04b22b1a3d2d0f0dd67c7b68a0d8f1e2c3d4e5'
+      // Password: teach2026
+      passwordHash: 'f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9'
     },
     {
       username: 'teacher8',
-      displayName: 'teacher8',
-      grades: [9],
+      displayName: 'Grade 8',
+      grades: [8],
       isAdmin: false,
-      passwordHash: 'b9c950640b1e23e09b5a2cfd6b04b22b1a3d2d0f0dd67c7b68a0d8f1e2c3d4e5'
+      // Password: teach2026
+      passwordHash: 'f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9'
     }
   ]
 };
