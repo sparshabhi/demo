@@ -1,78 +1,51 @@
-const CONFIG = {
-  adminEmail: 's51.saugatsingh@gmail.com',
-  emailjs: {
-    publicKey:  'nBrv0rPpGqu7UbhI9',
-    serviceId:  'service_gw3kngx',
-    templateId: 'template_eg2y64c',
-  },
-  teachers: [
-    {
-      username: 'saugat',
-      displayName: 'Admin',
-      grades: [1,2,3,4,5,6,7,8],
-      isAdmin: true,
-      passwordHash: 'f17511d7dbe579cd55e6bbb52b64e21e97b975c4a096d343eaaa6f0293bdb19b'
-    },
-    {
-      username: 'Grade1',
-      displayName: 'Grade 1',
-      grades: [1],
-      isAdmin: false,
-      passwordHash: 'f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9'
-    },
-    {
-      username: 'Grade2',
-      displayName: 'Grade 2',
-      grades: [2],
-      isAdmin: false,
-      passwordHash: 'f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9'
-    },
-    {
-      username: 'teacher3',
-      displayName: 'Grade 3',
-      grades: [3],
-      isAdmin: false,
-      passwordHash: 'f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9'
-    },
-    {
-      username: 'teacher4',
-      displayName: 'Grade 4',
-      grades: [4],
-      isAdmin: false,
-      passwordHash: 'f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9'
-    },
-    {
-      username: 'teacher5',
-      displayName: 'Grade 5',
-      grades: [5],
-      isAdmin: false,
-      passwordHash: 'f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9'
-    },
-    {
-      username: 'teacher6',
-      displayName: 'Grade 6',
-      grades: [6],
-      isAdmin: false,
-      passwordHash: 'f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9'
-    },
-    {
-      username: 'teacher7',
-      displayName: 'Grade 7',
-      grades: [7],
-      isAdmin: false,
-      passwordHash: 'f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9'
-    },
-    {
-      username: 'teacher8',
-      displayName: 'Grade 8',
-      grades: [8],
-      isAdmin: false,
-      passwordHash: 'f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9'
+let currentUser = null;
+async function handleLogin(e) {
+  e.preventDefault();
+  const username = document.getElementById('loginUser').value.trim().toLowerCase();
+  const password = document.getElementById('loginPass').value;
+  const errEl    = document.getElementById('loginError');
+  errEl.textContent = '';
+  const teacher = CONFIG.teachers.find(t => t.username.toLowerCase() === username);
+  if (!teacher) {
+    errEl.textContent = 'Username not found.';
+    return;
+  }
+  const hash = await hashPassword(password);
+  if (hash !== teacher.passwordHash) {
+    errEl.textContent = 'Incorrect password.';
+    return;
+  }
+  currentUser = teacher;
+  sessionStorage.setItem('ept_user', JSON.stringify({ username: teacher.username }));
+  if (CONFIG.emailjs.publicKey && CONFIG.emailjs.publicKey !== 'YOUR_EMAILJS_PUBLIC_KEY') {
+    emailjs.init({ publicKey: CONFIG.emailjs.publicKey });
+  }
+  launchApp();
+}
+function signOut() {
+  currentUser = null;
+  sessionStorage.removeItem('ept_user');
+  selectedStudentId = null;
+  document.getElementById('appScreen').classList.remove('active');
+  document.getElementById('loginScreen').classList.add('active');
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginUser').value = '';
+}
+function tryResumeSession() {
+  const saved = sessionStorage.getItem('ept_user');
+  if (!saved) return false;
+  try {
+    const { username } = JSON.parse(saved);
+    const teacher = CONFIG.teachers.find(t => t.username === username);
+    if (!teacher) return false;
+    currentUser = teacher;
+    if (CONFIG.emailjs.publicKey && CONFIG.emailjs.publicKey !== 'YOUR_EMAILJS_PUBLIC_KEY') {
+      emailjs.init({ publicKey: CONFIG.emailjs.publicKey });
     }
-  ]
-};
-
-async function hashPassword(plain) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(plain));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+    return true;
+  } catch(e) { return false; }
+}
+function canAccessGrade(grade) {
+  if (!currentUser) return false;
+  return currentUser.grades.includes(Number(grade));
 }
