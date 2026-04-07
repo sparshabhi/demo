@@ -51,11 +51,11 @@ const CONFIG = {
   // passwordHash: SHA-256 of their password (hex string).
   teachers: [
     {
-      username: 'admin',
+      username: 'saugat',
       displayName: 'Admin',
       grades: [1,2,3,4,5,6,7,8],
       isAdmin: true,
-      // Password: admin123
+      // Password: saugat
       passwordHash: '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9'
     },
     {
