@@ -213,6 +213,12 @@ const SUBJECT_COLORS = {
   'Social Studies':   ['#FFF0F5','#A0306A'],
 };
 
+const LSRW_COLORS = {
+  High:    { bg:'#E6F5EB', border:'#5BBF7A', text:'#2D7D46', dot:'#2D7D46' },
+  Average: { bg:'#FEF3E0', border:'#E6A82A', text:'#9B6200', dot:'#9B6200' },
+  Low:     { bg:'#FDECEA', border:'#E57373', text:'#C0392B', dot:'#C0392B' },
+};
+
 // ── Tab Router ────────────────────────────────────────────────────────────────
 function renderTabContent() {
   if (!selectedStudentId) return;
@@ -220,6 +226,7 @@ function renderTabContent() {
   const c = document.getElementById('tabContent');
   if (currentTab === 'overview')      renderOverview(s, c);
   else if (currentTab === 'rt')       renderRT(s, c);
+  else if (currentTab === 'lsrw')     renderLSRW(s, c);
   else if (currentTab === 'outcomes') renderOutcomes(s, c);
   else if (currentTab === 'projects') renderProjects(s, c);
   else if (currentTab === 'support')  renderSupport(s, c);
@@ -229,13 +236,13 @@ function renderTabContent() {
 /* ── OVERVIEW ── */
 function renderOverview(s, c) {
   const pd = projectsDoneCount(s);
-  const fc = Object.values(s.flags).filter(Boolean).length;
   const ra = rtAverage(s);
   const outcomes = LEARNING_OUTCOMES[s.grade] || [];
   const achievedCount = outcomes.filter(o => s.outcomes && s.outcomes[o.id]).length;
   const curr = CDC_CURRICULUM[s.grade];
   const totalThemes = curr ? curr.themes.length : 0;
   const coveredThemes = curr ? curr.themes.filter(t => s.cdcProgress && s.cdcProgress[t.id] === 'covered').length : 0;
+  if (!s.lsrw) s.lsrw = { listening:'Average', speaking:'Average', reading:'Average', writing:'Average' };
 
   c.innerHTML = `
   <div class="grid-4">
@@ -244,13 +251,29 @@ function renderOverview(s, c) {
     <div class="stat-card"><div class="stat-label">Outcomes</div><div class="stat-value">${achievedCount}<span style="font-size:16px;color:var(--text-faint)">/${outcomes.length}</span></div><div class="stat-sub">achieved</div></div>
     <div class="stat-card"><div class="stat-label">CDC Themes</div><div class="stat-value">${coveredThemes}<span style="font-size:16px;color:var(--text-faint)">/${totalThemes}</span></div><div class="stat-sub">covered</div></div>
   </div>
-  <div class="grid-2">
+
+  <div class="grid-2" style="margin-bottom:16px">
     <div class="card">
       <div class="card-title">RT proficiency <span class="hint">see RT tab to edit</span></div>
       <div class="radar-wrap"><canvas id="overviewRadar"></canvas></div>
     </div>
     <div class="card">
-      <div class="card-title">Learning outcomes <span class="hint">Grade ${s.grade} · click Outcomes tab to edit</span></div>
+      <div class="card-title">LSRW English Skills <span class="hint">see LSRW tab to edit</span></div>
+      ${LSRW_DOMAINS.map(d => {
+        const level = (s.lsrw && s.lsrw[d]) || 'Average';
+        const col = LSRW_COLORS[level];
+        return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+          <span style="font-size:16px">${LSRW_ICONS[d]}</span>
+          <span style="font-size:13px;font-weight:500;flex:1">${LSRW_LABELS[d]}</span>
+          <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:${col.bg};color:${col.text};border:1px solid ${col.border}">${level}</span>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Learning outcomes <span class="hint">Grade ${s.grade}</span></div>
       ${outcomes.map(o => {
         const achieved = s.outcomes && s.outcomes[o.id];
         return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)">
@@ -258,17 +281,6 @@ function renderOverview(s, c) {
           <span style="font-size:12px;color:var(--text-${achieved?'faint':'muted'});${achieved?'text-decoration:line-through':''}">${o.label}</span>
         </div>`;
       }).join('')}
-    </div>
-  </div>
-  <div class="grid-2" style="margin-top:14px">
-    <div class="card">
-      <div class="card-title">Projects checklist</div>
-      ${PROJECTS.map(p => `
-      <div style="display:flex;align-items:center;gap:8px;padding:4px 0">
-        <div style="width:14px;height:14px;border-radius:3px;flex-shrink:0;${s.projects[p.id]?'background:var(--green)':'border:1.5px solid var(--border-md)'}"></div>
-        <span style="font-size:12px;color:var(--text-${s.projects[p.id]?'faint':'muted'});${s.projects[p.id]?'text-decoration:line-through':''}">${p.name}</span>
-        <span class="term-badge t${p.term}" style="margin-left:auto">T${p.term}</span>
-      </div>`).join('')}
     </div>
     <div class="card">
       <div class="card-title">Active flags</div>
@@ -280,6 +292,13 @@ function renderOverview(s, c) {
           </div>`).join('')
         : '<div style="font-size:12px;color:var(--text-faint);padding:4px 0">No active flags — all clear ✓</div>'
       }
+      <div class="card-title" style="margin-top:16px">Projects</div>
+      ${PROJECTS.map(p => `
+      <div style="display:flex;align-items:center;gap:8px;padding:4px 0">
+        <div style="width:14px;height:14px;border-radius:3px;flex-shrink:0;${s.projects[p.id]?'background:var(--green)':'border:1.5px solid var(--border-md)'}"></div>
+        <span style="font-size:12px;color:var(--text-${s.projects[p.id]?'faint':'muted'});${s.projects[p.id]?'text-decoration:line-through':''}">${p.name}</span>
+        <span class="term-badge t${p.term}" style="margin-left:auto">T${p.term}</span>
+      </div>`).join('')}
     </div>
   </div>`;
   drawRadar('overviewRadar', s);
@@ -331,15 +350,14 @@ function renderRT(s, c) {
         </div>
       </div>`).join('')}
       <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
-        <div class="ov-section-title">Rating rubric</div>
-        ${[['1','Beginning','Rarely attempts strategy independently'],
-           ['2','Developing','Attempts with teacher prompting'],
-           ['3','Proficient','Applies independently most of the time'],
-           ['4','Advanced','Consistent; can explain strategy to peers']].map(([n,t,d]) => `
-        <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px">
-          <div style="width:20px;height:20px;border-radius:5px;background:var(--accent-lt);color:var(--accent);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0">${n}</div>
-          <div><div style="font-size:12px;font-weight:500">${t}</div><div style="font-size:11px;color:var(--text-muted)">${d}</div></div>
-        </div>`).join('')}
+        <div class="ov-section-title">Prescriptive Feedback</div>
+        ${['predict','question','clarify','summarize'].map(k => {
+          const feedback = RT_FEEDBACK[k][s.rt[k]];
+          return `<div style="margin-bottom:12px;padding:10px 12px;border-radius:8px;background:var(--accent-lt);border-left:3px solid var(--accent)">
+            <div style="font-size:11px;font-weight:600;color:var(--accent);margin-bottom:3px">${RT_LABELS[k]}</div>
+            <div style="font-size:12px;color:var(--text-muted);line-height:1.5">${feedback}</div>
+          </div>`;
+        }).join('')}
       </div>
     </div>
   </div>`;
@@ -349,6 +367,54 @@ function renderRT(s, c) {
 function setRT(key, val) {
   const s = getStudent(selectedStudentId);
   s.rt[key] = val;
+  saveStudents();
+  renderTabContent();
+}
+
+/* ── LSRW ── */
+function renderLSRW(s, c) {
+  if (!s.lsrw) s.lsrw = { listening:'Average', speaking:'Average', reading:'Average', writing:'Average' };
+
+  c.innerHTML = `
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title">English Language Skills — LSRW Assessment</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px">
+      Set each domain to <strong style="color:#2D7D46">High</strong>, <strong style="color:#9B6200">Average</strong>, or <strong style="color:#C0392B">Low</strong>. Prescriptive feedback is generated automatically.
+    </div>
+    <div class="grid-2">
+      ${LSRW_DOMAINS.map(d => {
+        const level = s.lsrw[d] || 'Average';
+        const col = LSRW_COLORS[level];
+        return `
+        <div style="border:1.5px solid ${col.border};border-radius:10px;padding:16px;background:${col.bg}">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+            <span style="font-size:22px">${LSRW_ICONS[d]}</span>
+            <span style="font-size:14px;font-weight:600;color:${col.text}">${LSRW_LABELS[d]}</span>
+          </div>
+          <div style="display:flex;gap:6px;margin-bottom:14px">
+            ${['High','Average','Low'].map(lvl => {
+              const c2 = LSRW_COLORS[lvl];
+              const active = level === lvl;
+              return `<button onclick="setLSRW('${d}','${lvl}')"
+                style="flex:1;padding:6px 0;border-radius:6px;font-size:12px;font-weight:${active?'700':'400'};cursor:pointer;transition:all 0.15s;
+                border:1.5px solid ${active?c2.border:'var(--border-md)'};
+                background:${active?c2.border:'var(--surface)'};
+                color:${active?'#fff':c2.text}">${lvl}</button>`;
+            }).join('')}
+          </div>
+          <div style="font-size:11px;color:${col.text};line-height:1.55;background:rgba(255,255,255,0.6);padding:8px 10px;border-radius:6px">
+            ${LSRW_FEEDBACK[d][level]}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+function setLSRW(domain, level) {
+  const s = getStudent(selectedStudentId);
+  if (!s.lsrw) s.lsrw = {};
+  s.lsrw[domain] = level;
   saveStudents();
   renderTabContent();
 }
@@ -548,4 +614,158 @@ function cycleCDCTheme(themeId) {
   else s.cdcProgress[themeId] = next;
   saveStudents();
   renderTabContent();
+}
+
+/* ── ADMIN DASHBOARD ── */
+function renderAdminDashboard() {
+  if (!currentUser || !currentUser.isAdmin) return;
+  const c = document.getElementById('tabContent');
+
+  // Build grade filter options
+  const grades = [...new Set(students.map(s => s.grade))].sort((a,b) => a-b);
+  const gradeFilter = document.getElementById('adminGradeFilter') ?
+    document.getElementById('adminGradeFilter').value : 'all';
+
+  const visible = gradeFilter === 'all' ? students : students.filter(s => String(s.grade) === gradeFilter);
+
+  // Aggregate LSRW
+  const lsrwCounts = {};
+  LSRW_DOMAINS.forEach(d => { lsrwCounts[d] = { High:0, Average:0, Low:0 }; });
+  visible.forEach(s => {
+    if (!s.lsrw) return;
+    LSRW_DOMAINS.forEach(d => {
+      const lvl = s.lsrw[d] || 'Average';
+      lsrwCounts[d][lvl]++;
+    });
+  });
+
+  // RT averages per grade
+  const rtByGrade = {};
+  visible.forEach(s => {
+    if (!rtByGrade[s.grade]) rtByGrade[s.grade] = [];
+    rtByGrade[s.grade].push(parseFloat(rtAverage(s)));
+  });
+
+  const flaggedCount  = visible.filter(s => hasFlag(s)).length;
+  const totalProjects = visible.reduce((a,s) => a + projectsDoneCount(s), 0);
+  const avgRT = visible.length ? (visible.reduce((a,s) => a + parseFloat(rtAverage(s)), 0) / visible.length).toFixed(1) : '—';
+
+  c.innerHTML = `
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+    <div style="font-family:var(--font-display);font-size:20px">Class Dashboard</div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <select id="adminGradeFilter" onchange="renderAdminDashboard()" style="padding:7px 12px;border:1px solid var(--border-md);border-radius:6px;font-size:13px;background:var(--surface)">
+        <option value="all">All Grades</option>
+        ${grades.map(g => `<option value="${g}" ${gradeFilter==g?'selected':''}>Grade ${g}</option>`).join('')}
+      </select>
+      <button onclick="openClassReportModal()" style="padding:7px 14px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer">⊞ Class Report</button>
+      <button onclick="openEngagementModal()" style="padding:7px 14px;background:var(--green);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer">📣 Engagement</button>
+    </div>
+  </div>
+
+  <div class="grid-4" style="margin-bottom:20px">
+    <div class="stat-card"><div class="stat-label">Total Students</div><div class="stat-value">${visible.length}</div><div class="stat-sub">in selection</div></div>
+    <div class="stat-card"><div class="stat-label">Avg RT Score</div><div class="stat-value">${avgRT}</div><div class="stat-sub">out of 4.0</div></div>
+    <div class="stat-card"><div class="stat-label">Projects Done</div><div class="stat-value">${totalProjects}</div><div class="stat-sub">across class</div></div>
+    <div class="stat-card" style="border-color:${flaggedCount>0?'var(--red)':'var(--border)'}"><div class="stat-label">Flagged</div><div class="stat-value" style="color:${flaggedCount>0?'var(--red)':'var(--text)'}">${flaggedCount}</div><div class="stat-sub">need attention</div></div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:16px">
+    <div class="card">
+      <div class="card-title">LSRW Class Overview</div>
+      ${LSRW_DOMAINS.map(d => {
+        const total = visible.length || 1;
+        const h = lsrwCounts[d].High, av = lsrwCounts[d].Average, lo = lsrwCounts[d].Low;
+        const hPct = Math.round((h/total)*100), avPct = Math.round((av/total)*100), loPct = Math.round((lo/total)*100);
+        return `
+        <div style="margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+            <span style="font-size:12px;font-weight:500">${LSRW_ICONS[d]} ${LSRW_LABELS[d]}</span>
+            <div style="display:flex;gap:6px;font-size:10px">
+              <span style="color:#2D7D46;font-weight:600">${h} High</span>
+              <span style="color:#9B6200;font-weight:600">${av} Avg</span>
+              <span style="color:#C0392B;font-weight:600">${lo} Low</span>
+            </div>
+          </div>
+          <div style="height:8px;border-radius:4px;overflow:hidden;display:flex;background:var(--surface-2)">
+            ${hPct > 0  ? `<div style="width:${hPct}%;background:#5BBF7A;transition:width 0.4s"></div>` : ''}
+            ${avPct > 0 ? `<div style="width:${avPct}%;background:#E6A82A;transition:width 0.4s"></div>` : ''}
+            ${loPct > 0 ? `<div style="width:${loPct}%;background:#E57373;transition:width 0.4s"></div>` : ''}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="card">
+      <div class="card-title">RT Average by Grade</div>
+      ${Object.entries(rtByGrade).sort(([a],[b])=>a-b).map(([grade, vals]) => {
+        const avg = (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1);
+        const pct = (parseFloat(avg)/4)*100;
+        return `
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <span style="font-size:12px;color:var(--text-muted);width:52px;flex-shrink:0">Grade ${grade}</span>
+          <div style="flex:1;height:8px;background:var(--surface-2);border-radius:4px;overflow:hidden">
+            <div style="width:${pct}%;height:100%;background:var(--accent);border-radius:4px;transition:width 0.4s"></div>
+          </div>
+          <span style="font-size:12px;font-weight:600;width:28px;text-align:right">${avg}</span>
+        </div>`;
+      }).join('') || '<div style="font-size:12px;color:var(--text-faint)">No data yet.</div>'}
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">All Students — Progress at a Glance</div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead>
+          <tr style="background:var(--surface-2)">
+            <th style="padding:8px 12px;text-align:left;font-weight:500;color:var(--text-muted)">Student</th>
+            <th style="padding:8px 12px;text-align:center;font-weight:500;color:var(--text-muted)">Grade</th>
+            <th style="padding:8px 12px;text-align:center;font-weight:500;color:var(--text-muted)">Section</th>
+            <th style="padding:8px 12px;text-align:center;font-weight:500;color:var(--text-muted)">Roll</th>
+            <th style="padding:8px 12px;text-align:center;font-weight:500;color:var(--text-muted)">RT Avg</th>
+            <th style="padding:8px 12px;text-align:center;font-weight:500;color:var(--text-muted)">Listen</th>
+            <th style="padding:8px 12px;text-align:center;font-weight:500;color:var(--text-muted)">Speak</th>
+            <th style="padding:8px 12px;text-align:center;font-weight:500;color:var(--text-muted)">Read</th>
+            <th style="padding:8px 12px;text-align:center;font-weight:500;color:var(--text-muted)">Write</th>
+            <th style="padding:8px 12px;text-align:center;font-weight:500;color:var(--text-muted)">Projects</th>
+            <th style="padding:8px 12px;text-align:center;font-weight:500;color:var(--text-muted)">Flags</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${visible.sort((a,b) => a.grade - b.grade || a.name.localeCompare(b.name)).map((s, i) => {
+            const lsrw = s.lsrw || {};
+            const fc = Object.values(s.flags).filter(Boolean).length;
+            return `<tr style="border-top:1px solid var(--border);background:${i%2===0?'var(--surface)':'var(--surface-2)'};cursor:pointer" onclick="selectStudentFromDashboard('${s.id}')">
+              <td style="padding:8px 12px">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="width:24px;height:24px;border-radius:50%;background:${s.color[0]};color:${s.color[1]};font-size:9px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0">${initials(s.name)}</div>
+                  <span style="font-weight:500">${s.name}</span>
+                </div>
+              </td>
+              <td style="padding:8px 12px;text-align:center">${s.grade}</td>
+              <td style="padding:8px 12px;text-align:center;color:var(--text-muted)">${s.section||'—'}</td>
+              <td style="padding:8px 12px;text-align:center;color:var(--text-muted)">${s.roll||'—'}</td>
+              <td style="padding:8px 12px;text-align:center">
+                <span style="font-weight:600;color:${parseFloat(rtAverage(s))>=3?'var(--green)':parseFloat(rtAverage(s))>=2?'var(--amber)':'var(--red)'}">${rtAverage(s)}</span>
+              </td>
+              ${LSRW_DOMAINS.map(d => {
+                const lvl = lsrw[d] || 'Average';
+                const col = LSRW_COLORS[lvl];
+                return `<td style="padding:8px 12px;text-align:center"><span style="font-size:10px;padding:2px 7px;border-radius:10px;background:${col.bg};color:${col.text};font-weight:600;border:1px solid ${col.border}">${lvl[0]}</span></td>`;
+              }).join('')}
+              <td style="padding:8px 12px;text-align:center">${projectsDoneCount(s)}/6</td>
+              <td style="padding:8px 12px;text-align:center">${fc > 0 ? `<span style="color:var(--red);font-weight:600">⚑ ${fc}</span>` : '<span style="color:var(--text-faint)">—</span>'}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function selectStudentFromDashboard(id) {
+  // Switch back to student view
+  document.getElementById('adminDashboardScreen') && (document.getElementById('adminDashboardScreen').style.display = 'none');
+  selectStudent(id);
+  switchTab('overview');
 }
