@@ -1,7 +1,6 @@
 /**
  * ui.js — sidebar rendering, modals, toast, general UI helpers
  */
-
 let selectedStudentId = null;
 let currentTab = 'overview';
 let radarChartInstance = null;
@@ -11,6 +10,25 @@ function renderSidebar() {
   const list = document.getElementById('studentList');
   list.innerHTML = '';
 
+  // Admin dashboard button
+  if (currentUser && currentUser.isAdmin) {
+    const adminBtn = document.createElement('div');
+    adminBtn.id = 'adminDashBtn';
+    adminBtn.className = 'student-item' + (selectedStudentId === '__admin__' ? ' active' : '');
+    adminBtn.innerHTML = `
+      <div class="s-avatar" style="background:#EBF0FE;color:#2B5CE6;font-size:13px">⊞</div>
+      <div style="flex:1;min-width:0">
+        <div class="s-name" style="color:var(--accent);font-weight:500">Class Dashboard</div>
+        <div class="s-grade">${students.length} students</div>
+      </div>`;
+    adminBtn.onclick = openAdminDashboard;
+    list.appendChild(adminBtn);
+    // Divider
+    const div = document.createElement('div');
+    div.style.cssText = 'height:1px;background:var(--border);margin:4px 0 8px';
+    list.appendChild(div);
+  }
+
   const visible = students.filter(s => {
     if (!canAccessGrade(s.grade)) return false;
     if (gradeVal !== 'all' && String(s.grade) !== gradeVal) return false;
@@ -18,12 +36,14 @@ function renderSidebar() {
   });
 
   if (visible.length === 0) {
-    list.innerHTML = '<div style="font-size:12px;color:var(--text-faint);padding:8px 4px;text-align:center">No students found</div>';
+    const empty = document.createElement('div');
+    empty.style.cssText = 'font-size:12px;color:var(--text-faint);padding:8px 4px;text-align:center';
+    empty.textContent = 'No students found';
+    list.appendChild(empty);
     return;
   }
 
   visible.sort((a,b) => a.name.localeCompare(b.name));
-
   visible.forEach(s => {
     const div = document.createElement('div');
     div.className = 'student-item' + (s.id === selectedStudentId ? ' active' : '');
@@ -31,7 +51,7 @@ function renderSidebar() {
       <div class="s-avatar" style="background:${s.color[0]};color:${s.color[1]}">${initials(s.name)}</div>
       <div style="flex:1;min-width:0">
         <div class="s-name">${s.name}</div>
-        <div class="s-grade">Grade ${s.grade}</div>
+        <div class="s-grade">Grade ${s.grade}${s.section?' · '+s.section:''}${s.roll?' · #'+s.roll:''}</div>
       </div>
       ${hasFlag(s) ? '<div class="s-flag"></div>' : ''}
     `;
@@ -42,11 +62,9 @@ function renderSidebar() {
 
 function filterStudents() { renderSidebar(); }
 
-function selectStudent(id) {
-  selectedStudentId = id;
-  const s = getStudent(id);
+function openAdminDashboard() {
+  selectedStudentId = '__admin__';
   renderSidebar();
-
   document.getElementById('mainEmpty').style.display = 'none';
   const dash = document.getElementById('studentDashboard');
   dash.style.display = 'flex';
@@ -54,13 +72,50 @@ function selectStudent(id) {
 
   // Header
   const av = document.getElementById('dashAvatar');
+  av.style.background = '#EBF0FE';
+  av.style.color = '#2B5CE6';
+  av.textContent = '⊞';
+  document.getElementById('dashName').textContent = 'Class Dashboard';
+  document.getElementById('dashMeta').textContent = `${students.length} students · Admin view`;
+
+  // Hide report/delete buttons for admin view
+  document.getElementById('reportBtn').style.display = 'none';
+  document.getElementById('deleteBtn').style.display = 'none';
+
+  // Switch to admin tab
+  const tabNav = document.getElementById('tabNav');
+  tabNav.querySelectorAll('.tab').forEach(btn => btn.classList.remove('active'));
+
+  // Use tab content area to render admin dashboard
+  renderAdminDashboard();
+}
+
+function selectStudent(id) {
+  selectedStudentId = id;
+  const s = getStudent(id);
+  renderSidebar();
+  document.getElementById('mainEmpty').style.display = 'none';
+  const dash = document.getElementById('studentDashboard');
+  dash.style.display = 'flex';
+  dash.style.flexDirection = 'column';
+
+  // Show report/delete buttons
+  document.getElementById('reportBtn').style.display = '';
+  document.getElementById('deleteBtn').style.display = '';
+
+  // Header
+  const av = document.getElementById('dashAvatar');
   av.style.background = s.color[0];
   av.style.color = s.color[1];
   av.textContent = initials(s.name);
   document.getElementById('dashName').textContent = s.name;
-  document.getElementById('dashMeta').textContent = `Grade ${s.grade} · Added by ${s.createdBy}`;
+  const meta = [`Grade ${s.grade}`];
+  if (s.section) meta.push('Section ' + s.section);
+  if (s.roll)    meta.push('Roll No. ' + s.roll);
+  meta.push('Added by ' + s.createdBy);
+  document.getElementById('dashMeta').textContent = meta.join(' · ');
 
-  switchTab(currentTab);
+  switchTab(currentTab === '__admin__' ? 'overview' : currentTab);
 }
 
 function switchTab(tab) {
@@ -85,41 +140,4 @@ function showToast(msg, isError = false) {
   t.textContent = msg;
   t.className = 'toast show' + (isError ? ' error' : '');
   setTimeout(() => { t.className = 'toast'; }, 2600);
-}
-
-function launchApp() {
-  document.getElementById('loginScreen').classList.remove('active');
-  document.getElementById('appScreen').classList.add('active');
-
-  // Populate grade filter based on teacher's grades
-  const sel = document.getElementById('gradeFilter');
-  Array.from(sel.options).forEach(opt => {
-    if (opt.value === 'all') return;
-    opt.style.display = canAccessGrade(opt.value) ? '' : 'none';
-  });
-
-  document.getElementById('teacherBadge').textContent = currentUser.displayName;
-  loadStudents();
-  renderSidebar();
-
-  // Seed demo students for admin on first launch
-  if (currentUser.isAdmin && students.length === 0) {
-    seedDemoStudents();
-    renderSidebar();
-  }
-}
-
-function seedDemoStudents() {
-  const demos = [
-    ['Aanya Sharma', 3], ['Ben Kowalski', 5], ['Chloe Obi', 2],
-    ['Daniel Park', 7], ['Emma Johansson', 4]
-  ];
-  demos.forEach(([name, grade]) => {
-    const s = makeStudent(name, grade);
-    students.push(s);
-  });
-  students[0].flags.dysgraphia = true;
-  students[0].interventions = [{ date: '2025-09-12', text: 'Referred to OT for pencil grip assessment' }];
-  students[2].rt = { predict:3, question:2, clarify:3, summarize:2 };
-  saveStudents();
 }
