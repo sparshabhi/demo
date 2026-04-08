@@ -6,7 +6,7 @@
 const CONFIG = {
   // ⚠️ SECURITY: These should be environment variables in production
   // For now, use placeholder values - configure via environment
-  adminEmail: process.env.ADMIN_EMAIL || 'admin@example.com',
+  adminEmail: 's51.saugatsingh@gmail.com' || 'admin@example.com',
 
   emailjs: {
     publicKey: nBrv0rPpGqu7UbhI9|| 'YOUR_EMAILJS_PUBLIC_KEY',
