@@ -8,19 +8,13 @@ const AVATAR_COLORS = [
   ['#FFF0F5','#A0306A'], ['#F0F4E8','#4A6D1A']
 ];
 
-const GMT_DATA = {
-  giraffe:  { emoji: '🦒', label: 'Tall ascenders',  letters: ['b','d','f','h','i','j','k','l','t'] },
-  monkey:   { emoji: '🐒', label: 'Descenders',      letters: ['g','j','p','q','y'] },
-  tortoise: { emoji: '🐢', label: 'Middle zone',     letters: ['a','c','e','m','n','o','r','s','u','v','w','x','z'] }
-};
-
 const PROJECTS = [
-  { id:'p1', name:'My Story World',        term:1, rt:'Predicting + Summarizing',   gmt:'Giraffe letters',   desc:'Personal narrative writing exploring imagination and storytelling.' },
-  { id:'p2', name:'Animal Kingdom Report', term:1, rt:'Questioning + Clarifying',   gmt:'Tortoise letters',  desc:'Non-fiction research report on a chosen animal.' },
-  { id:'p3', name:'Poetry Anthology',      term:2, rt:'Summarizing',                gmt:'All letter types',  desc:'Collection of original and copied poems demonstrating handwriting skills.' },
-  { id:'p4', name:'Book Review',           term:2, rt:'Predicting + Questioning',   gmt:'Monkey letters',    desc:'Structured review of a class reader using RT scenarios.' },
-  { id:'p5', name:'News Report',           term:3, rt:'Clarifying + Summarizing',   gmt:'Mixed focus',       desc:'Journalistic piece on a school or local event.' },
-  { id:'p6', name:'Reflective Journal',    term:3, rt:'All four strategies',        gmt:'All letter types',  desc:'End-of-year reflection demonstrating mastery of RT and GMT skills.' }
+  { id:'p1', name:'My Story World',        term:1, rt:'Predicting + Summarizing',   desc:'Personal narrative writing exploring imagination and storytelling.' },
+  { id:'p2', name:'Animal Kingdom Report', term:1, rt:'Questioning + Clarifying',   desc:'Non-fiction research report on a chosen animal.' },
+  { id:'p3', name:'Poetry Anthology',      term:2, rt:'Summarizing',                desc:'Collection of original and copied poems demonstrating handwriting skills.' },
+  { id:'p4', name:'Book Review',           term:2, rt:'Predicting + Questioning',   desc:'Structured review of a class reader using RT scenarios.' },
+  { id:'p5', name:'News Report',           term:3, rt:'Clarifying + Summarizing',   desc:'Journalistic piece on a school or local event.' },
+  { id:'p6', name:'Reflective Journal',    term:3, rt:'All four strategies',        desc:'End-of-year reflection demonstrating mastery of RT and GMT skills.' }
 ];
 
 const FLAGS = [
@@ -33,6 +27,62 @@ const FLAGS = [
 ];
 
 const RT_LABELS = { predict:'Predicting', question:'Questioning', clarify:'Clarifying', summarize:'Summarizing' };
+
+// LSRW domains and prescriptive feedback
+const LSRW_DOMAINS = ['listening','speaking','reading','writing'];
+const LSRW_LABELS  = { listening:'Listening', speaking:'Speaking', reading:'Reading', writing:'Writing' };
+const LSRW_ICONS   = { listening:'👂', speaking:'🗣️', reading:'📖', writing:'✍️' };
+
+const LSRW_FEEDBACK = {
+  listening: {
+    High:    'Excellent listening skills — continue to engage with complex audio texts and debates to further stretch comprehension.',
+    Average: 'If your performance in Listening is at an average level, you are advised to practise active listening by summarising spoken passages daily.',
+    Low:     'If your performance in Listening is below the expected threshold, you are advised to begin with short audio stories and answer guided comprehension questions aloud.'
+  },
+  speaking: {
+    High:    'Outstanding speaking ability — take leadership in discussions, debates, and presentations to model confident English for peers.',
+    Average: 'If your performance in Speaking is at an average level, you are advised to practise reading aloud for 10 minutes each day and record yourself to identify areas for improvement.',
+    Low:     'If your performance in Speaking is below the expected threshold, you are advised to start with structured sentence starters and simple oral responses before building to extended speaking tasks.'
+  },
+  reading: {
+    High:    'Strong reading comprehension — challenge yourself with longer, more complex texts and analytical reading tasks.',
+    Average: 'If your performance in Reading is at an average level, you are advised to read at least one graded reader per week and focus on identifying the main idea and supporting details.',
+    Low:     'If your performance in Reading is below the expected threshold, you are advised to work with phonics-based decodable texts and revisit foundational fluency strategies with teacher support.'
+  },
+  writing: {
+    High:    'Excellent writing — focus on refining style, voice, and complexity in extended writing tasks.',
+    Average: 'If your performance in Writing is at an average level, you are advised to practise structured paragraph writing daily, using a topic sentence, supporting ideas, and a concluding sentence.',
+    Low:     'If your performance in Writing is below the expected threshold, you are advised to focus on sentence construction, correct punctuation, and spelling of high-frequency words before moving to paragraphs.'
+  }
+};
+
+// RT prescriptive feedback
+const RT_FEEDBACK = {
+  predict: {
+    1: 'If your Predicting score is at the beginning stage, you are advised to look at titles, images, and headings before reading and write down what you think the text will be about.',
+    2: 'If your Predicting score is developing, you are advised to practise making predictions using sentence starters ("I think… because…") and check them after reading.',
+    3: 'Your predicting skill is proficient — work on justifying predictions with specific text evidence.',
+    4: 'Advanced predictor — challenge yourself to predict authorial intent and genre conventions.'
+  },
+  question: {
+    1: 'If your Questioning score is at the beginning stage, you are advised to practise asking at least one "Why?" or "How?" question per paragraph you read.',
+    2: 'If your Questioning score is developing, you are advised to move from literal questions to inferential ones using the question starters "Why might…?" and "What would happen if…?"',
+    3: 'Your questioning skill is proficient — focus on crafting evaluative and critical questions.',
+    4: 'Advanced questioner — model your questioning strategies to peers and explore Socratic seminar techniques.'
+  },
+  clarify: {
+    1: 'If your Clarifying score is at the beginning stage, you are advised to underline unfamiliar words and use context clues or a dictionary before asking for help.',
+    2: 'If your Clarifying score is developing, you are advised to identify confusing sentences and restate them in your own words to check understanding.',
+    3: 'Your clarifying skill is proficient — practise explaining complex passages to a partner without looking at the text.',
+    4: 'Advanced clarifier — focus on clarifying ambiguous authorial choices and figurative language.'
+  },
+  summarize: {
+    1: 'If your Summarising score is at the beginning stage, you are advised to practise retelling a text using only 3 sentences: beginning, middle, and end.',
+    2: 'If your Summarising score is developing, you are advised to use the "main idea + 2 key details" framework to write summaries after each reading session.',
+    3: 'Your summarising skill is proficient — practise writing summaries without looking back at the text.',
+    4: 'Advanced summariser — challenge yourself to summarise across multiple texts, identifying common themes.'
+  }
+};
 
 // ── JSONBin Cloud Storage ─────────────────────────────────────────────────────
 const JSONBIN_KEY = '$2a$10$52TyfZ/CO4k6o05mMkvWuOTsqty/llTq.8XldYvYtaYlN86P3U.a6';
@@ -122,15 +172,21 @@ function loadStudents() { return cloudLoad(); }
 function saveStudents() { return cloudSave(); }
 
 // ── Student model ─────────────────────────────────────────────────────────────
-function makeStudent(name, grade) {
+function makeStudent(name, grade, section = '', roll = '') {
   const id = 's' + Date.now() + Math.random().toString(36).slice(2,7);
   const color = AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)];
   return {
-    id, name, grade: Number(grade), color,
+    id, name,
+    grade: Number(grade),
+    section: section || '',
+    roll: roll || '',
+    color,
     createdBy: currentUser ? currentUser.username : 'unknown',
     rt: { predict:1, question:1, clarify:1, summarize:1 },
-    gmt: { giraffe:{}, monkey:{}, tortoise:{} },
+    lsrw: { listening:'Average', speaking:'Average', reading:'Average', writing:'Average' },
     projects: { p1:false, p2:false, p3:false, p4:false, p5:false, p6:false },
+    outcomes: {},
+    cdcProgress: {},
     flags: {},
     interventions: []
   };
@@ -139,15 +195,19 @@ function makeStudent(name, grade) {
 function getStudent(id) { return students.find(s => s.id === id); }
 
 function addStudent() {
-  const name  = document.getElementById('newStudentName').value.trim();
-  const grade = document.getElementById('newStudentGrade').value;
+  const name    = document.getElementById('newStudentName').value.trim();
+  const grade   = document.getElementById('newStudentGrade').value;
+  const section = document.getElementById('newStudentSection').value.trim();
+  const roll    = document.getElementById('newStudentRoll').value.trim();
   if (!name) return;
   if (!canAccessGrade(grade)) { showToast('You cannot add students to that grade.', true); return; }
-  const s = makeStudent(name, grade);
+  const s = makeStudent(name, grade, section, roll);
   students.push(s);
   saveStudents();
   closeModal('addStudentModal');
   document.getElementById('newStudentName').value = '';
+  document.getElementById('newStudentSection').value = '';
+  document.getElementById('newStudentRoll').value = '';
   renderSidebar();
   selectStudent(s.id);
   showToast('Student added ☁️');
@@ -184,16 +244,11 @@ function rtAverage(s) {
   return (vals.reduce((a,b) => a+b, 0) / vals.length).toFixed(1);
 }
 
-function gmtMasteredCount(s) {
-  return Object.values(s.gmt).reduce((a, g) => a + Object.values(g).filter(v => v === 'mastered').length, 0);
-}
-
 function projectsDoneCount(s) {
   return PROJECTS.filter(p => s.projects[p.id]).length;
 }
 
 // ── CSV / Excel Import ────────────────────────────────────────────────────────
-
 function openImportModal() {
   document.getElementById('importModal').style.display = 'flex';
   document.getElementById('importFile').value = '';
@@ -207,7 +262,7 @@ function handleImportFile(e) {
   const file = e.target.files[0];
   if (!file) return;
   const ext = file.name.split('.').pop().toLowerCase();
-  const status = document.getElementById('importStatus');
+  const status  = document.getElementById('importStatus');
   const preview = document.getElementById('importPreview');
   const confirmBtn = document.getElementById('importConfirmBtn');
   preview.innerHTML = '';
@@ -278,11 +333,12 @@ function showImportPreview(rows, status, preview, confirmBtn) {
     return;
   }
   const header = rows[0].map(h => h.toLowerCase().trim());
-  const nameIdx = header.findIndex(h => h.includes('student name') || h === 'name');
-  const gradeIdx = header.findIndex(h => h === 'grade' || h.startsWith('grade'));
+  const nameIdx     = header.findIndex(h => h.includes('student name') || h === 'name');
+  const gradeIdx    = header.findIndex(h => h === 'grade' || h.startsWith('grade'));
+  const sectionIdx  = header.findIndex(h => h.includes('section'));
+  const rollIdx     = header.findIndex(h => h.includes('roll'));
   const guardianIdx = header.findIndex(h => h.includes('guardian'));
-  const genderIdx = header.findIndex(h => h.includes('gender'));
-  const rollIdx = header.findIndex(h => h.includes('roll'));
+  const genderIdx   = header.findIndex(h => h.includes('gender'));
 
   if (nameIdx === -1 || gradeIdx === -1) {
     status.textContent = '❌ Could not find "Name" and "Grade" columns.';
@@ -292,16 +348,18 @@ function showImportPreview(rows, status, preview, confirmBtn) {
 
   const parsed = [], skipped = [];
   rows.slice(1).forEach((row, i) => {
-    const name = (row[nameIdx] || '').trim();
-    const gradeRaw = (row[gradeIdx] || '').toString().trim();
-    const grade = gradeWordToNumber(gradeRaw);
+    const name     = (row[nameIdx]     || '').trim();
+    const gradeRaw = (row[gradeIdx]    || '').toString().trim();
+    const grade    = gradeWordToNumber(gradeRaw);
+    const section  = sectionIdx  !== -1 ? (row[sectionIdx]  || '').trim() : '';
+    const roll     = rollIdx     !== -1 ? (row[rollIdx]     || '').toString().trim() : '';
     const guardian = guardianIdx !== -1 ? (row[guardianIdx] || '').trim() : '';
-    const gender = genderIdx !== -1 ? (row[genderIdx] || '').trim() : '';
-    const roll = rollIdx !== -1 ? (row[rollIdx] || '').trim() : '';
-    if (!name) { skipped.push(`Row ${i+2}: empty name`); return; }
+    const gender   = genderIdx   !== -1 ? (row[genderIdx]   || '').trim() : '';
+
+    if (!name)                              { skipped.push(`Row ${i+2}: empty name`); return; }
     if (isNaN(grade) || grade < 1 || grade > 8) { skipped.push(`Row ${i+2}: invalid grade "${gradeRaw}"`); return; }
-    if (!canAccessGrade(grade)) { skipped.push(`Row ${i+2}: ${name} — no access`); return; }
-    parsed.push({ name, grade, guardian, gender, roll });
+    if (!canAccessGrade(grade))             { skipped.push(`Row ${i+2}: ${name} — no access`); return; }
+    parsed.push({ name, grade, section, roll, guardian, gender });
   });
 
   window._importParsed = parsed;
@@ -311,11 +369,30 @@ function showImportPreview(rows, status, preview, confirmBtn) {
     return;
   }
 
+  const hasSec = parsed.some(p => p.section);
+  const hasRoll = parsed.some(p => p.roll);
+  const hasGen  = parsed.some(p => p.gender);
+  const hasGrd  = parsed.some(p => p.guardian);
+
   let html = `<div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">Found <strong>${parsed.length}</strong> student${parsed.length>1?'s':''} to import${skipped.length ? ` · ${skipped.length} skipped` : ''}:</div>`;
   html += `<div style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:8px"><table style="width:100%;border-collapse:collapse;font-size:13px">`;
-  html += `<thead><tr style="background:var(--surface-2)"><th style="padding:6px 12px;text-align:left">Name</th><th style="padding:6px 12px;text-align:left">Grade</th>${parsed[0].gender?'<th style="padding:6px 12px;text-align:left">Gender</th>':''}${parsed[0].guardian?'<th style="padding:6px 12px;text-align:left">Guardian</th>':''}</tr></thead><tbody>`;
+  html += `<thead><tr style="background:var(--surface-2)">
+    <th style="padding:6px 10px;text-align:left">Name</th>
+    <th style="padding:6px 10px;text-align:left">Grade</th>
+    ${hasSec  ? '<th style="padding:6px 10px;text-align:left">Section</th>' : ''}
+    ${hasRoll ? '<th style="padding:6px 10px;text-align:left">Roll No.</th>' : ''}
+    ${hasGen  ? '<th style="padding:6px 10px;text-align:left">Gender</th>' : ''}
+    ${hasGrd  ? '<th style="padding:6px 10px;text-align:left">Guardian</th>' : ''}
+  </tr></thead><tbody>`;
   parsed.forEach((s, i) => {
-    html += `<tr style="border-top:1px solid var(--border);background:${i%2===0?'var(--surface)':'var(--surface-2)'}"><td style="padding:6px 12px">${s.name}</td><td style="padding:6px 12px">Grade ${s.grade}</td>${s.gender?`<td style="padding:6px 12px">${s.gender}</td>`:''}${s.guardian?`<td style="padding:6px 12px;font-size:11px">${s.guardian}</td>`:''}</tr>`;
+    html += `<tr style="border-top:1px solid var(--border);background:${i%2===0?'var(--surface)':'var(--surface-2)'}">
+      <td style="padding:6px 10px">${s.name}</td>
+      <td style="padding:6px 10px">Grade ${s.grade}</td>
+      ${hasSec  ? `<td style="padding:6px 10px">${s.section||'—'}</td>` : ''}
+      ${hasRoll ? `<td style="padding:6px 10px">${s.roll||'—'}</td>` : ''}
+      ${hasGen  ? `<td style="padding:6px 10px">${s.gender||'—'}</td>` : ''}
+      ${hasGrd  ? `<td style="padding:6px 10px;font-size:11px">${s.guardian||'—'}</td>` : ''}
+    </tr>`;
   });
   html += `</tbody></table></div>`;
   if (skipped.length) html += `<div style="font-size:11px;color:var(--text-faint);margin-top:6px">Skipped: ${skipped.join(' · ')}</div>`;
@@ -329,13 +406,12 @@ async function confirmImport() {
   const parsed = window._importParsed || [];
   if (!parsed.length) return;
   let added = 0, dupes = 0;
-  parsed.forEach(({ name, grade, guardian, gender, roll }) => {
+  parsed.forEach(({ name, grade, section, roll, guardian, gender }) => {
     const exists = students.some(s => s.name.toLowerCase() === name.toLowerCase() && s.grade === grade);
     if (exists) { dupes++; return; }
-    const s = makeStudent(name, grade);
+    const s = makeStudent(name, grade, section, roll);
     if (guardian) s.guardian = guardian;
-    if (gender) s.gender = gender;
-    if (roll) s.roll = roll;
+    if (gender)   s.gender   = gender;
     students.push(s);
     added++;
   });
