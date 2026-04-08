@@ -9,9 +9,9 @@ const CONFIG = {
   adminEmail: process.env.ADMIN_EMAIL || 'admin@example.com',
 
   emailjs: {
-    publicKey: process.env.EMAILJS_PUBLIC_KEY || 'YOUR_EMAILJS_PUBLIC_KEY',
-    serviceId: process.env.EMAILJS_SERVICE_ID || 'YOUR_EMAILJS_SERVICE_ID',
-    templateId: process.env.EMAILJS_TEMPLATE_ID || 'YOUR_EMAILJS_TEMPLATE_ID',
+    publicKey: nBrv0rPpGqu7UbhI9|| 'YOUR_EMAILJS_PUBLIC_KEY',
+    serviceId: service_gw3kngx || 'YOUR_EMAILJS_SERVICE_ID',
+    templateId: template_eg2y64c || 'YOUR_EMAILJS_TEMPLATE_ID',
   },
 
   // Session timeout in milliseconds (30 minutes)
