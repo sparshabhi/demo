@@ -24,7 +24,8 @@ const CONFIG = {
       grades: [1, 2, 3, 4, 5, 6, 7, 8],
       isAdmin: true,
       // Password: "admin123" - Change this to your secure password
-      passwordHash: 'f17511d7dbe579cd55e6bbb52b64e21e97b975c4a096d343eaaa6f0293bdb19b'
+      passwordHash: c822a0abf4ef0a5fc2a4c2010ed111e16af3ae95cee462a55e7877b8623ade36
+
     },
     {
       username: 'Grade1',
@@ -33,7 +34,8 @@ const CONFIG = {
       isAdmin: false,
       // FIXED: Unique password hash for each teacher
       // Password: "grade1pass" - Change this
-      passwordHash: 'c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2'
+      passwordHash: c822a0abf4ef0a5fc2a4c2010ed111e16af3ae95cee462a55e7877b8623ade36
+
     },
     {
       username: 'Grade2',
@@ -41,7 +43,8 @@ const CONFIG = {
       grades: [2],
       isAdmin: false,
       // Password: "grade2pass" - Change this
-      passwordHash: '3ad1e9f5d2e2de23fd4e2a5e61e5d5e2c5d5c5d5c5d5c5d5c5d5c5d5c5d5c'
+      passwordHash: c822a0abf4ef0a5fc2a4c2010ed111e16af3ae95cee462a55e7877b8623ade36
+
     },
     {
       username: 'teacher3',
@@ -49,7 +52,8 @@ const CONFIG = {
       grades: [3],
       isAdmin: false,
       // Password: "grade3pass" - Change this
-      passwordHash: '4bd2f0g6e3f3ef34ge5f3b6f62f6e6e3d6e6d6e6d6e6d6e6d6e6d6e6d6e6d'
+      passwordHash: c822a0abf4ef0a5fc2a4c2010ed111e16af3ae95cee462a55e7877b8623ade36
+
     },
     {
       username: 'teacher4',
@@ -57,7 +61,8 @@ const CONFIG = {
       grades: [4],
       isAdmin: false,
       // Password: "grade4pass" - Change this
-      passwordHash: '5ce3g1h7f4g4fg45hf6g4c7g63g7f7f4e7f7e7f7e7f7e7f7e7f7e7f7e7f7e'
+      passwordHash: c822a0abf4ef0a5fc2a4c2010ed111e16af3ae95cee462a55e7877b8623ade36
+
     },
     {
       username: 'teacher5',
@@ -65,7 +70,8 @@ const CONFIG = {
       grades: [5],
       isAdmin: false,
       // Password: "grade5pass" - Change this
-      passwordHash: '6df4h2i8g5h5gh56ig7h5d8h74h8g8g5f8g8f8g8f8g8f8g8f8g8f8g8f8g8f'
+      passwordHash: c822a0abf4ef0a5fc2a4c2010ed111e16af3ae95cee462a55e7877b8623ade36
+
     },
     {
       username: 'teacher6',
@@ -73,7 +79,8 @@ const CONFIG = {
       grades: [6],
       isAdmin: false,
       // Password: "grade6pass" - Change this
-      passwordHash: '7eg5i3j9h6i6hi67jh8i6e9i85i9h9h6g9h9g9h9g9h9g9h9g9h9g9h9g9h9g'
+      passwordHash: c822a0abf4ef0a5fc2a4c2010ed111e16af3ae95cee462a55e7877b8623ade36
+
     },
     {
       username: 'teacher7',
@@ -81,7 +88,9 @@ const CONFIG = {
       grades: [7],
       isAdmin: false,
       // Password: "grade7pass" - Change this
-      passwordHash: '8fh6j4k0i7j7ij78ki9j7f0j96j0i0i7h0i0h0i0h0i0h0i0h0i0h0i0h0i0h'
+      passwordHash: c822a0abf4ef0a5fc2a4c2010ed111e16af3ae95cee462a55e7877b8623ade36
+
+
     },
     {
       username: 'teacher8',
@@ -89,7 +98,8 @@ const CONFIG = {
       grades: [8],
       isAdmin: false,
       // Password: "grade8pass" - Change this
-      passwordHash: '9gi7k5l1j8k8jk89lj0k8g1k07k1j1j8i1j1i1j1i1j1i1j1i1j1i1j1i1j1i'
+      passwordHash: c822a0abf4ef0a5fc2a4c2010ed111e16af3ae95cee462a55e7877b8623ade36
+
     }
   ]
 };
